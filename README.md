@@ -214,7 +214,8 @@ elevenlabs-agent-toolkit/
 │   └── troubleshooting.md
 ├── examples/
 │   ├── webhooks/                # Next.js, Express, FastAPI
-│   └── tools/                   # CRM, calendar, SMS, logging
+│   ├── tools/                   # CRM, calendar, SMS, logging
+│   └── .env.example             # Environment variable reference
 ├── skill/                       # Claude Code skill
 │   └── agents.md
 └── scripts/
