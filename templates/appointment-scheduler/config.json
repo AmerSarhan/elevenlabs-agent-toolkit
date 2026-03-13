@@ -1,0 +1,272 @@
+{
+  "conversation_config": {
+    "agent": {
+      "prompt": {
+        "prompt": "See prompt.md — paste your customized prompt here"
+      },
+      "first_message": "Hi, thanks for calling [Company]. Are you looking to book an appointment?",
+      "language": "en"
+    },
+    "asr": {
+      "quality": "high",
+      "keywords": [
+        "appointment",
+        "booking",
+        "schedule",
+        "reschedule",
+        "cancel",
+        "cancellation",
+        "available",
+        "availability",
+        "opening",
+        "slot",
+        "morning",
+        "afternoon",
+        "evening",
+        "Monday",
+        "Tuesday",
+        "Wednesday",
+        "Thursday",
+        "Friday",
+        "Saturday",
+        "Sunday",
+        "next week",
+        "tomorrow",
+        "today",
+        "ASAP",
+        "consultation",
+        "follow-up",
+        "initial",
+        "confirmation",
+        "reminder"
+      ]
+    },
+    "turn": {
+      "mode": {
+        "type": "turn_based"
+      },
+      "turn_timeout": 15,
+      "eagerness": "normal"
+    },
+    "tts": {
+      "model_id": "eleven_flash_v2",
+      "voice_id": "placeholder_voice_id",
+      "stability": 0.35,
+      "similarity_boost": 0.8,
+      "speed": 1.0
+    },
+    "conversation": {
+      "model_id": "gpt-4.1",
+      "temperature": 0.6,
+      "max_tokens": 200
+    },
+    "tools": [
+      {
+        "type": "webhook",
+        "name": "check_availability",
+        "description": "Check available appointment slots for a given date range and service type. Returns open time slots.",
+        "webhook": {
+          "url": "https://your-api.example.com/api/appointments/availability",
+          "method": "POST",
+          "headers": {
+            "Authorization": "Bearer {{BOOKING_API_KEY}}",
+            "Content-Type": "application/json"
+          }
+        },
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "date_from": {
+              "type": "string",
+              "description": "Start date for availability check (YYYY-MM-DD)"
+            },
+            "date_to": {
+              "type": "string",
+              "description": "End date for availability check (YYYY-MM-DD)"
+            },
+            "service_type": {
+              "type": "string",
+              "description": "The type of appointment or service requested"
+            },
+            "provider": {
+              "type": "string",
+              "description": "Specific provider or practitioner requested, if any"
+            }
+          },
+          "required": ["date_from", "date_to"]
+        }
+      },
+      {
+        "type": "webhook",
+        "name": "book_appointment",
+        "description": "Book a confirmed appointment for the client. Creates the appointment record and reserves the time slot.",
+        "webhook": {
+          "url": "https://your-api.example.com/api/appointments/book",
+          "method": "POST",
+          "headers": {
+            "Authorization": "Bearer {{BOOKING_API_KEY}}",
+            "Content-Type": "application/json"
+          }
+        },
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "client_name": {
+              "type": "string",
+              "description": "Full name of the client"
+            },
+            "datetime": {
+              "type": "string",
+              "description": "Appointment date and time (ISO 8601)"
+            },
+            "service_type": {
+              "type": "string",
+              "description": "Type of appointment or service"
+            },
+            "provider": {
+              "type": "string",
+              "description": "Assigned provider or practitioner"
+            },
+            "contact_number": {
+              "type": "string",
+              "description": "Client's phone number"
+            },
+            "email": {
+              "type": "string",
+              "description": "Client's email address"
+            },
+            "special_requirements": {
+              "type": "string",
+              "description": "Any special needs, accessibility requirements, or notes"
+            }
+          },
+          "required": ["client_name", "datetime", "service_type"]
+        }
+      },
+      {
+        "type": "webhook",
+        "name": "cancel_appointment",
+        "description": "Cancel an existing appointment. Looks up by client name, phone number, or appointment ID.",
+        "webhook": {
+          "url": "https://your-api.example.com/api/appointments/cancel",
+          "method": "POST",
+          "headers": {
+            "Authorization": "Bearer {{BOOKING_API_KEY}}",
+            "Content-Type": "application/json"
+          }
+        },
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "appointment_id": {
+              "type": "string",
+              "description": "The appointment ID if the client has it"
+            },
+            "client_name": {
+              "type": "string",
+              "description": "Client's name for lookup"
+            },
+            "contact_number": {
+              "type": "string",
+              "description": "Client's phone number for lookup"
+            },
+            "reason": {
+              "type": "string",
+              "description": "Reason for cancellation"
+            }
+          }
+        }
+      },
+      {
+        "type": "webhook",
+        "name": "send_confirmation",
+        "description": "Send an appointment confirmation via SMS or email to the client.",
+        "webhook": {
+          "url": "https://your-api.example.com/api/appointments/confirm",
+          "method": "POST",
+          "headers": {
+            "Authorization": "Bearer {{BOOKING_API_KEY}}",
+            "Content-Type": "application/json"
+          }
+        },
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "appointment_id": {
+              "type": "string",
+              "description": "The booked appointment ID"
+            },
+            "method": {
+              "type": "string",
+              "description": "How to send the confirmation",
+              "enum": ["sms", "email", "both"]
+            },
+            "contact": {
+              "type": "string",
+              "description": "Phone number or email to send confirmation to"
+            }
+          },
+          "required": ["appointment_id", "method", "contact"]
+        }
+      },
+      {
+        "type": "end_call",
+        "name": "end_call",
+        "description": "End the call after the appointment is booked, cancelled, or the caller has no further needs."
+      }
+    ]
+  },
+  "platform_settings": {
+    "evaluation_criteria": [
+      {
+        "id": "appointment_booked",
+        "name": "Appointment Booked",
+        "description": "An appointment was successfully booked, rescheduled, or cancelled as requested.",
+        "type": "boolean"
+      },
+      {
+        "id": "all_details_collected",
+        "name": "All Details Collected",
+        "description": "The agent collected all necessary information: name, service, date/time, contact info.",
+        "type": "boolean"
+      },
+      {
+        "id": "confirmation_sent",
+        "name": "Confirmation Sent",
+        "description": "A confirmation was sent to the client after booking.",
+        "type": "boolean"
+      }
+    ],
+    "data_collection": {
+      "client_name": {
+        "type": "string",
+        "description": "Full name of the client"
+      },
+      "service_requested": {
+        "type": "string",
+        "description": "The type of appointment or service the client wants"
+      },
+      "preferred_date": {
+        "type": "string",
+        "description": "The client's preferred date for the appointment"
+      },
+      "preferred_time": {
+        "type": "string",
+        "description": "The client's preferred time of day",
+        "enum": ["early_morning", "morning", "afternoon", "evening", "flexible"]
+      },
+      "contact_number": {
+        "type": "string",
+        "description": "Client's phone number"
+      },
+      "email": {
+        "type": "string",
+        "description": "Client's email address"
+      },
+      "special_requirements": {
+        "type": "string",
+        "description": "Any special needs, accessibility requirements, or preparation instructions"
+      }
+    }
+  }
+}

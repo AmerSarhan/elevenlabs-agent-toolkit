@@ -1,0 +1,195 @@
+{
+  "conversation_config": {
+    "agent": {
+      "prompt": {
+        "prompt": "See prompt.md — paste your customized prompt here"
+      },
+      "first_message": "Good morning, thanks for calling [Company]. Who am I speaking with?",
+      "language": "en"
+    },
+    "asr": {
+      "quality": "high",
+      "keywords": [
+        "sales",
+        "support",
+        "billing",
+        "accounting",
+        "HR",
+        "human resources",
+        "engineering",
+        "marketing",
+        "legal",
+        "operations",
+        "manager",
+        "director",
+        "appointment",
+        "meeting",
+        "schedule",
+        "extension",
+        "voicemail",
+        "message",
+        "callback",
+        "office hours",
+        "location",
+        "address",
+        "fax"
+      ]
+    },
+    "turn": {
+      "mode": {
+        "type": "turn_based"
+      },
+      "turn_timeout": 15,
+      "eagerness": "normal"
+    },
+    "tts": {
+      "model_id": "eleven_flash_v2",
+      "voice_id": "placeholder_voice_id",
+      "stability": 0.4,
+      "similarity_boost": 0.8,
+      "speed": 1.0
+    },
+    "conversation": {
+      "model_id": "glm-45-air-fp8",
+      "temperature": 0.5,
+      "max_tokens": 150
+    },
+    "tools": [
+      {
+        "type": "transfer",
+        "name": "transfer_to_department",
+        "description": "Transfer the caller to a specific department or person. Use after confirming the caller's intent and the correct destination.",
+        "transfer": {
+          "phone_number_map": {
+            "sales": "+1-XXX-XXX-XX01",
+            "support": "+1-XXX-XXX-XX02",
+            "billing": "+1-XXX-XXX-XX03",
+            "hr": "+1-XXX-XXX-XX04",
+            "general": "+1-XXX-XXX-XX00"
+          },
+          "message": "Let me transfer you now. One moment please."
+        }
+      },
+      {
+        "type": "webhook",
+        "name": "check_hours",
+        "description": "Check business hours, holiday schedules, or department availability for the current day.",
+        "webhook": {
+          "url": "https://your-api.example.com/api/hours",
+          "method": "GET",
+          "headers": {
+            "Authorization": "Bearer {{API_KEY}}",
+            "Content-Type": "application/json"
+          }
+        },
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "department": {
+              "type": "string",
+              "description": "The department to check hours for"
+            }
+          }
+        }
+      },
+      {
+        "type": "webhook",
+        "name": "take_message",
+        "description": "Record a message for a person or department when they are unavailable. Creates a message record that will be delivered.",
+        "webhook": {
+          "url": "https://your-api.example.com/api/messages",
+          "method": "POST",
+          "headers": {
+            "Authorization": "Bearer {{API_KEY}}",
+            "Content-Type": "application/json"
+          }
+        },
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "for_person": {
+              "type": "string",
+              "description": "The name of the person the message is for"
+            },
+            "for_department": {
+              "type": "string",
+              "description": "The department the message is for"
+            },
+            "caller_name": {
+              "type": "string",
+              "description": "Name of the person leaving the message"
+            },
+            "caller_company": {
+              "type": "string",
+              "description": "Company of the person leaving the message"
+            },
+            "callback_number": {
+              "type": "string",
+              "description": "Phone number to call back"
+            },
+            "message": {
+              "type": "string",
+              "description": "The message content"
+            },
+            "urgency": {
+              "type": "string",
+              "description": "How urgent the message is",
+              "enum": ["normal", "urgent"]
+            }
+          },
+          "required": ["caller_name", "message"]
+        }
+      },
+      {
+        "type": "end_call",
+        "name": "end_call",
+        "description": "End the call after the caller has been helped, transferred, or left a message."
+      }
+    ]
+  },
+  "platform_settings": {
+    "evaluation_criteria": [
+      {
+        "id": "caller_identified",
+        "name": "Caller Identified",
+        "description": "The agent identified who is calling and the purpose of their call.",
+        "type": "boolean"
+      },
+      {
+        "id": "routed_correctly",
+        "name": "Routed Correctly",
+        "description": "The agent transferred to the correct department or took an appropriate message.",
+        "type": "boolean"
+      },
+      {
+        "id": "professional_tone",
+        "name": "Professional Tone",
+        "description": "The agent maintained a polished, professional front-desk demeanor throughout.",
+        "type": "boolean"
+      }
+    ],
+    "data_collection": {
+      "caller_name": {
+        "type": "string",
+        "description": "Full name of the caller"
+      },
+      "caller_company": {
+        "type": "string",
+        "description": "Company or organization the caller represents"
+      },
+      "reason_for_call": {
+        "type": "string",
+        "description": "Brief summary of why the caller is calling"
+      },
+      "department_requested": {
+        "type": "string",
+        "description": "Which department or person the caller wants to reach",
+        "enum": ["sales", "support", "billing", "hr", "engineering", "marketing", "legal", "operations", "specific_person", "unknown"]
+      },
+      "message_content": {
+        "type": "string",
+        "description": "Content of any message left by the caller"
+      }
+    }
+  }
+}

@@ -1,0 +1,137 @@
+{
+  "conversation_config": {
+    "agent": {
+      "prompt": {
+        "prompt": "See prompt.md — paste your customized prompt here"
+      },
+      "first_message": "Hi there, thanks for taking the time. I'm calling from [Company] — we'd love to get your quick feedback on your recent experience. It'll only take a couple of minutes. Shall we go ahead?",
+      "language": "en"
+    },
+    "asr": {
+      "quality": "high",
+      "keywords": [
+        "one",
+        "two",
+        "three",
+        "four",
+        "five",
+        "strongly agree",
+        "agree",
+        "neutral",
+        "disagree",
+        "strongly disagree",
+        "satisfied",
+        "dissatisfied",
+        "excellent",
+        "good",
+        "fair",
+        "poor",
+        "terrible",
+        "yes",
+        "no",
+        "maybe",
+        "not sure",
+        "skip",
+        "pass",
+        "no comment",
+        "N/A",
+        "not applicable",
+        "improvement",
+        "recommend",
+        "unlikely",
+        "likely",
+        "very likely"
+      ]
+    },
+    "turn": {
+      "mode": {
+        "type": "turn_based"
+      },
+      "turn_timeout": 20,
+      "eagerness": "patient"
+    },
+    "tts": {
+      "model_id": "eleven_flash_v2",
+      "voice_id": "placeholder_voice_id",
+      "stability": 0.5,
+      "similarity_boost": 0.8,
+      "speed": 1.0
+    },
+    "conversation": {
+      "model_id": "glm-45-air-fp8",
+      "temperature": 0.4,
+      "max_tokens": 150
+    },
+    "tools": [
+      {
+        "type": "end_call",
+        "name": "end_call",
+        "description": "End the call after the survey is completed, the respondent declines to participate, or the respondent asks to stop."
+      }
+    ]
+  },
+  "platform_settings": {
+    "evaluation_criteria": [
+      {
+        "id": "survey_completed",
+        "name": "Survey Completed",
+        "description": "The respondent answered all survey questions (or the agent recorded skips for declined questions).",
+        "type": "boolean"
+      },
+      {
+        "id": "all_questions_asked",
+        "name": "All Questions Asked",
+        "description": "The agent asked every question in the survey in the correct order.",
+        "type": "boolean"
+      },
+      {
+        "id": "respondent_comfortable",
+        "name": "Respondent Comfortable",
+        "description": "The agent maintained a comfortable pace and did not pressure the respondent on any question.",
+        "type": "boolean"
+      }
+    ],
+    "data_collection": {
+      "respondent_name": {
+        "type": "string",
+        "description": "Name of the person who took the survey"
+      },
+      "q1_rating": {
+        "type": "string",
+        "description": "Rating for question 1 on a scale of 1 to 5",
+        "enum": ["1", "2", "3", "4", "5", "skipped"]
+      },
+      "q1_feedback": {
+        "type": "string",
+        "description": "Open-ended feedback for question 1"
+      },
+      "q2_rating": {
+        "type": "string",
+        "description": "Rating for question 2 on a scale of 1 to 5",
+        "enum": ["1", "2", "3", "4", "5", "skipped"]
+      },
+      "q2_feedback": {
+        "type": "string",
+        "description": "Open-ended feedback for question 2"
+      },
+      "q3_rating": {
+        "type": "string",
+        "description": "Rating for question 3 on a scale of 1 to 5",
+        "enum": ["1", "2", "3", "4", "5", "skipped"]
+      },
+      "q3_feedback": {
+        "type": "string",
+        "description": "Open-ended feedback for question 3"
+      },
+      "overall_satisfaction": {
+        "type": "string",
+        "description": "Overall satisfaction level expressed by the respondent",
+        "enum": ["very_dissatisfied", "dissatisfied", "neutral", "satisfied", "very_satisfied", "skipped"]
+      },
+      "additional_comments": {
+        "type": "string",
+        "description": "Any additional comments or suggestions the respondent offered"
+      }
+    }
+  }
+}

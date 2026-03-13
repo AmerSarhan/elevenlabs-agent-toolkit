@@ -1,0 +1,224 @@
+{
+  "conversation_config": {
+    "agent": {
+      "prompt": {
+        "prompt": "See prompt.md — paste your customized prompt here"
+      },
+      "first_message": "Hey, thanks for reaching out! I'd love to learn a bit about what you're looking for — what brought you to [Company] today?",
+      "language": "en"
+    },
+    "asr": {
+      "quality": "high",
+      "keywords": [
+        "pricing",
+        "demo",
+        "trial",
+        "enterprise",
+        "integration",
+        "API",
+        "onboarding",
+        "contract",
+        "annual",
+        "monthly",
+        "per seat",
+        "per user",
+        "ROI",
+        "competitor",
+        "migration",
+        "implementation",
+        "timeline",
+        "budget",
+        "decision maker",
+        "stakeholder",
+        "procurement",
+        "pilot",
+        "proof of concept",
+        "POC"
+      ]
+    },
+    "turn": {
+      "mode": {
+        "type": "turn_based"
+      },
+      "turn_timeout": 12,
+      "eagerness": "eager"
+    },
+    "tts": {
+      "model_id": "eleven_flash_v2",
+      "voice_id": "placeholder_voice_id",
+      "stability": 0.35,
+      "similarity_boost": 0.8,
+      "speed": 1.05
+    },
+    "conversation": {
+      "model_id": "gpt-4.1",
+      "temperature": 0.7,
+      "max_tokens": 250
+    },
+    "tools": [
+      {
+        "type": "webhook",
+        "name": "check_availability",
+        "description": "Check available demo or meeting slots for the sales team. Returns a list of available times within the requested date range.",
+        "webhook": {
+          "url": "https://your-api.example.com/api/calendar/availability",
+          "method": "POST",
+          "headers": {
+            "Authorization": "Bearer {{CALENDAR_API_KEY}}",
+            "Content-Type": "application/json"
+          }
+        },
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "date_from": {
+              "type": "string",
+              "description": "Start date for availability check (YYYY-MM-DD)"
+            },
+            "date_to": {
+              "type": "string",
+              "description": "End date for availability check (YYYY-MM-DD)"
+            },
+            "timezone": {
+              "type": "string",
+              "description": "The prospect's timezone (e.g., America/New_York)"
+            }
+          },
+          "required": ["date_from", "date_to"]
+        }
+      },
+      {
+        "type": "webhook",
+        "name": "book_demo",
+        "description": "Book a product demo with the sales team for the qualified lead.",
+        "webhook": {
+          "url": "https://your-api.example.com/api/calendar/book",
+          "method": "POST",
+          "headers": {
+            "Authorization": "Bearer {{CALENDAR_API_KEY}}",
+            "Content-Type": "application/json"
+          }
+        },
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "lead_name": {
+              "type": "string",
+              "description": "Full name of the prospect"
+            },
+            "company_name": {
+              "type": "string",
+              "description": "Prospect's company name"
+            },
+            "email": {
+              "type": "string",
+              "description": "Prospect's email for the calendar invite"
+            },
+            "datetime": {
+              "type": "string",
+              "description": "Selected meeting datetime (ISO 8601)"
+            },
+            "notes": {
+              "type": "string",
+              "description": "Context for the sales rep — what the prospect cares about"
+            }
+          },
+          "required": ["lead_name", "email", "datetime"]
+        }
+      },
+      {
+        "type": "webhook",
+        "name": "send_info",
+        "description": "Send product information, pricing details, or case studies to the prospect via email.",
+        "webhook": {
+          "url": "https://your-api.example.com/api/leads/send-info",
+          "method": "POST",
+          "headers": {
+            "Authorization": "Bearer {{SALES_API_KEY}}",
+            "Content-Type": "application/json"
+          }
+        },
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "email": {
+              "type": "string",
+              "description": "Prospect's email address"
+            },
+            "info_type": {
+              "type": "string",
+              "description": "Type of information to send",
+              "enum": ["pricing", "case_study", "product_overview", "comparison", "custom"]
+            },
+            "notes": {
+              "type": "string",
+              "description": "Any specific context about what the prospect wants to see"
+            }
+          },
+          "required": ["email", "info_type"]
+        }
+      },
+      {
+        "type": "end_call",
+        "name": "end_call",
+        "description": "End the call after next steps are confirmed or the prospect is not a fit."
+      }
+    ]
+  },
+  "platform_settings": {
+    "evaluation_criteria": [
+      {
+        "id": "lead_qualified",
+        "name": "Lead Qualified",
+        "description": "The agent determined whether the lead meets qualification criteria (budget, authority, need, timeline).",
+        "type": "boolean"
+      },
+      {
+        "id": "needs_identified",
+        "name": "Needs Identified",
+        "description": "The agent identified the prospect's specific pain points and requirements.",
+        "type": "boolean"
+      },
+      {
+        "id": "next_step_set",
+        "name": "Next Step Set",
+        "description": "The call ended with a clear next step — demo booked, info sent, or explicit disqualification.",
+        "type": "boolean"
+      }
+    ],
+    "data_collection": {
+      "lead_name": {
+        "type": "string",
+        "description": "Full name of the prospect"
+      },
+      "company_name": {
+        "type": "string",
+        "description": "Prospect's company or organization name"
+      },
+      "company_size": {
+        "type": "string",
+        "description": "Number of employees or relevant team size",
+        "enum": ["1-10", "11-50", "51-200", "201-1000", "1000+"]
+      },
+      "budget_range": {
+        "type": "string",
+        "description": "Indicated budget or spending capacity",
+        "enum": ["under_5k", "5k_25k", "25k_100k", "100k_plus", "unknown"]
+      },
+      "timeline": {
+        "type": "string",
+        "description": "When the prospect is looking to make a decision",
+        "enum": ["immediate", "1_3_months", "3_6_months", "6_plus_months", "exploring"]
+      },
+      "current_solution": {
+        "type": "string",
+        "description": "What the prospect is currently using to solve this problem"
+      },
+      "decision_maker": {
+        "type": "string",
+        "description": "Whether the contact is the decision maker or if others are involved",
+        "enum": ["yes", "no", "part_of_committee", "unknown"]
+      }
+    }
+  }
+}

@@ -1,0 +1,167 @@
+{
+  "conversation_config": {
+    "agent": {
+      "prompt": {
+        "prompt": "See prompt.md — paste your customized prompt here"
+      },
+      "first_message": "Thanks for calling [Company]. How can I help you today?",
+      "language": "en"
+    },
+    "asr": {
+      "quality": "high",
+      "keywords": [
+        "refund",
+        "cancel",
+        "billing",
+        "invoice",
+        "account",
+        "password",
+        "reset",
+        "upgrade",
+        "downgrade",
+        "subscription",
+        "charge",
+        "payment",
+        "shipping",
+        "delivery",
+        "tracking",
+        "return",
+        "exchange",
+        "warranty",
+        "broken",
+        "damaged",
+        "missing",
+        "order number",
+        "ticket",
+        "manager",
+        "supervisor",
+        "escalate"
+      ]
+    },
+    "turn": {
+      "mode": {
+        "type": "turn_based"
+      },
+      "turn_timeout": 15,
+      "eagerness": "normal"
+    },
+    "tts": {
+      "model_id": "eleven_flash_v2",
+      "voice_id": "placeholder_voice_id",
+      "stability": 0.4,
+      "similarity_boost": 0.8,
+      "speed": 1.0
+    },
+    "conversation": {
+      "model_id": "gpt-4.1",
+      "temperature": 0.7,
+      "max_tokens": 250
+    },
+    "tools": [
+      {
+        "type": "webhook",
+        "name": "lookup_ticket",
+        "description": "Look up an existing support ticket by ticket number or customer email. Returns ticket status, history, and associated details.",
+        "webhook": {
+          "url": "https://your-api.example.com/api/tickets/lookup",
+          "method": "POST",
+          "headers": {
+            "Authorization": "Bearer {{SUPPORT_API_KEY}}",
+            "Content-Type": "application/json"
+          }
+        },
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "ticket_number": {
+              "type": "string",
+              "description": "The ticket or case number provided by the customer"
+            },
+            "customer_email": {
+              "type": "string",
+              "description": "The customer's email address for account lookup"
+            }
+          }
+        }
+      },
+      {
+        "type": "transfer",
+        "name": "escalate_to_human",
+        "description": "Transfer the call to a human support agent. Use when the issue cannot be resolved, the customer requests a manager, or the situation requires human judgment.",
+        "transfer": {
+          "phone_number": "+1-XXX-XXX-XXXX",
+          "message": "I'm transferring you to a specialist who can help further. Please hold for just a moment."
+        }
+      },
+      {
+        "type": "end_call",
+        "name": "end_call",
+        "description": "End the call after the issue is resolved or the customer confirms they have no further questions."
+      }
+    ]
+  },
+  "platform_settings": {
+    "evaluation_criteria": [
+      {
+        "id": "issue_identified",
+        "name": "Issue Identified",
+        "description": "The agent clearly identified and confirmed the customer's issue before attempting resolution.",
+        "type": "boolean"
+      },
+      {
+        "id": "resolution_attempted",
+        "name": "Resolution Attempted",
+        "description": "The agent made a genuine attempt to resolve the issue or escalated appropriately.",
+        "type": "boolean"
+      },
+      {
+        "id": "professional_tone",
+        "name": "Professional Tone",
+        "description": "The agent maintained a professional, empathetic, and helpful tone throughout the conversation.",
+        "type": "boolean"
+      }
+    ],
+    "data_collection": {
+      "customer_name": {
+        "type": "string",
+        "description": "The customer's full name"
+      },
+      "issue_category": {
+        "type": "string",
+        "description": "Category of the issue: billing, technical, shipping, account, product, other",
+        "enum": [
+          "billing",
+          "technical",
+          "shipping",
+          "account",
+          "product",
+          "other"
+        ]
+      },
+      "issue_description": {
+        "type": "string",
+        "description": "A concise summary of the customer's issue"
+      },
+      "resolution_status": {
+        "type": "string",
+        "description": "Outcome of the call",
+        "enum": [
+          "resolved",
+          "escalated",
+          "pending",
+          "unresolved"
+        ]
+      },
+      "sentiment": {
+        "type": "string",
+        "description": "Customer's overall sentiment during the call",
+        "enum": [
+          "positive",
+          "neutral",
+          "frustrated",
+          "angry"
+        ]
+      }
+    }
+  }
+}
