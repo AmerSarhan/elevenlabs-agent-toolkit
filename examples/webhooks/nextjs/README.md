@@ -74,3 +74,41 @@ Runs after the call ends. It:
 
 - Persists call metadata, transcript summary, and data collection results to PostgreSQL
 - Sends a Slack notification if the call was escalated, unsuccessful, or unusually long
+
+## Deployment
+
+### Vercel (recommended)
+
+```bash
+# Install Vercel CLI
+npm install -g vercel
+
+# Deploy
+vercel
+
+# Set environment variables
+vercel env add CRM_API_KEY
+vercel env add CRM_BASE_URL
+vercel env add ELEVENLABS_API_KEY
+vercel env add ELEVENLABS_AGENT_ID
+vercel env add DATABASE_URL
+vercel env add NOTIFICATION_WEBHOOK_URL
+```
+
+Vercel Edge Functions have no cold start, making them ideal for the pre-call webhook's 5-second timeout.
+
+### Other platforms
+
+Any platform that supports Next.js works: Railway, Render, AWS Amplify, or a self-hosted Node.js server. For platforms with cold starts, add a keep-alive ping to avoid the first-call penalty.
+
+## Testing locally
+
+Use the included test script to simulate webhook calls:
+
+```bash
+# Start the dev server
+npm run dev
+
+# In another terminal, simulate a pre-call webhook
+../../../scripts/test-webhook.sh http://localhost:3000/api/webhooks/elevenlabs/pre-call
+```

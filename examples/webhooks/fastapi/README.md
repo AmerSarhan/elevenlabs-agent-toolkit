@@ -67,3 +67,39 @@ CREATE TABLE call_logs (
 The FastAPI versions use `httpx.AsyncClient` for non-blocking HTTP calls and `asyncio.gather` / `asyncio.wait_for` for concurrency and hard timeouts. The pre-call handler enforces a 4.5-second ceiling and returns a graceful fallback if any upstream service is slow. The post-call handler uses `asyncpg` for async database writes.
 
 See the Next.js README for detailed behavior descriptions of each webhook.
+
+## Deployment
+
+### Railway / Render / Fly.io
+
+```bash
+# Install production dependencies
+pip install -r requirements.txt
+
+# Run with uvicorn
+uvicorn main:app --host 0.0.0.0 --port 8000 --workers 2
+```
+
+Set environment variables in the platform dashboard. Use `--workers 2` or higher for production to handle concurrent webhook calls.
+
+### Docker
+
+```dockerfile
+FROM python:3.12-slim
+WORKDIR /app
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+COPY . .
+EXPOSE 8000
+CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000", "--workers", "2"]
+```
+
+### Testing locally
+
+```bash
+# Start the server
+uvicorn main:app --reload --port 8000
+
+# Simulate a pre-call webhook
+../../../scripts/test-webhook.sh http://localhost:8000/webhooks/elevenlabs/pre-call
+```

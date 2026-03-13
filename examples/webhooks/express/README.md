@@ -47,3 +47,39 @@ app.listen(3000);
 ## How it works
 
 The Express versions implement the same logic as the Next.js examples — CRM lookup, conversation history, personalized greeting, post-call logging, and Slack notifications — using Express `Router` instances instead of App Router route handlers. See the Next.js README for detailed behavior descriptions.
+
+## Deployment
+
+### Railway / Render
+
+```bash
+# Build
+npm run build
+
+# Start
+node dist/index.js
+```
+
+Set environment variables in the platform dashboard. Both Railway and Render support auto-deploy from GitHub.
+
+### Docker
+
+```dockerfile
+FROM node:20-slim
+WORKDIR /app
+COPY package*.json ./
+RUN npm ci --production
+COPY dist/ ./dist/
+EXPOSE 3000
+CMD ["node", "dist/index.js"]
+```
+
+### Testing locally
+
+```bash
+# Start the server
+npm run dev
+
+# Simulate a pre-call webhook
+../../../scripts/test-webhook.sh http://localhost:3000/webhooks/elevenlabs/pre-call
+```
