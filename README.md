@@ -9,6 +9,7 @@
 </p>
 
 <p align="center">
+  <a href="https://amersarhan.com/projects/elevenlabs-agent-toolkit">🌐 Landing Page</a> ·
   <a href="#-quick-start">Quick Start</a> ·
   <a href="#-agent-templates">Templates</a> ·
   <a href="#-checklists">Checklists</a> ·
